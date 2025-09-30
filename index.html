@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Quittance de Loyer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+        
+        .quittance {
+            display: none;
+            background: white;
+            padding: 40px;
+            margin-top: 30px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+        }
+        
+        .quittance.show {
+            display: block;
+        }
+        
+        .quittance-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .quittance-header h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .quittance-body {
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .quittance-body p {
+            margin-bottom: 15px;
+        }
+        
+        .info-block {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .signature-box {
+            width: 45%;
+        }
+        
+        .signature-box p {
+            margin-bottom: 60px;
+        }
+        
+        .btn-print {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        
+        .btn-print:hover {
+            background: #45a049;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            .header, .form-section, .button-container, .btn-print {
+                display: none;
+            }
+            
+            .quittance {
+                display: block !important;
+                border: none;
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Générateur de Quittance de Loyer</h1>
+            <p>Créez votre quittance en un clic</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <h2>👤 Informations du Bailleur</h2>
+                <div class="form-group">
+                    <label>Nom et Prénom</label>
+                    <input type="text" id="bailleurNom" value="Jean Dupont">
+                </div>
+                <div class="form-group">
+                    <label>Adresse</label>
+                    <input type="text" id="bailleurAdresse" value="10 Rue de la Paix, 75002 Paris">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>🏘️ Informations du Locataire</h2>
+                <div class="form-group">
+                    <label>Nom et Prénom</label>
+                    <input type="text" id="locataireNom" value="Marie Martin">
+                </div>
+                <div class="form-group">
+                    <label>Adresse du logement</label>
+                    <input type="text" id="locataireAdresse" value="25 Avenue des Champs, 75008 Paris">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>💰 Informations du Loyer</h2>
+                <div class="form-group">
+                    <label>Montant du loyer (€)</label>
+                    <input type="number" id="montantLoyer" value="1200">
+                </div>
+                <div class="form-group">
+                    <label>Charges (€)</label>
+                    <input type="number" id="montantCharges" value="150">
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <button class="btn-generate" onclick="genererQuittance()">
+                    ✨ Générer la Quittance
+                </button>
+            </div>
+            
+            <div id="quittanceContainer" class="quittance">
+                <div class="quittance-header">
+                    <h2>QUITTANCE DE LOYER</h2>
+                    <p id="dateQuittance"></p>
+                </div>
+                
+                <div class="quittance-body">
+                    <div class="info-block">
+                        <strong>Le bailleur :</strong><br>
+                        <span id="displayBailleurNom"></span><br>
+                        <span id="displayBailleurAdresse"></span>
+                    </div>
+                    
+                    <p>Déclare avoir reçu de :</p>
+                    
+                    <div class="info-block">
+                        <strong>Le locataire :</strong><br>
+                        <span id="displayLocataireNom"></span><br>
+                        Demeurant : <span id="displayLocataireAdresse"></span>
+                    </div>
+                    
+                    <p>La somme de <strong id="displayTotal"></strong> € (euros) au titre du paiement du loyer et des charges pour la période du <strong id="displayPeriode"></strong>.</p>
+                    
+                    <p>Cette somme se décompose comme suit :</p>
+                    
+                    <div class="info-block">
+                        <p>• Loyer : <strong id="displayLoyer"></strong> €</p>
+                        <p>• Charges : <strong id="displayCharges"></strong> €</p>
+                        <p style="margin-top: 10px; font-size: 18px;">• <strong>Total : <span id="displayTotal2"></span> €</strong></p>
+                    </div>
+                    
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <p><strong>Fait à Paris</strong></p>
+                            <p>Le <span id="displayDate"></span></p>
+                            <p>Signature du bailleur</p>
+                        </div>
+                    </div>
+                    
+                    <div class="button-container">
+                        <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function genererQuittance() {
+            const bailleurNom = document.getElementById('bailleurNom').value;
+            const bailleurAdresse = document.getElementById('bailleurAdresse').value;
+            const locataireNom = document.getElementById('locataireNom').value;
+            const locataireAdresse = document.getElementById('locataireAdresse').value;
+            const montantLoyer = parseFloat(document.getElementById('montantLoyer').value);
+            const montantCharges = parseFloat(document.getElementById('montantCharges').value);
+            
+            const maintenant = new Date();
+            const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+            const moisPrecedent = maintenant.getMonth() === 0 ? 11 : maintenant.getMonth() - 1;
+            const anneePrecedente = maintenant.getMonth() === 0 ? maintenant.getFullYear() - 1 : maintenant.getFullYear();
+            
+            const nomMois = mois[moisPrecedent];
+            const annee = anneePrecedente;
+            const total = montantLoyer + montantCharges;
+            
+            const jour = maintenant.getDate().toString().padStart(2, '0');
+            const moisActuel = (maintenant.getMonth() + 1).toString().padStart(2, '0');
+            const anneeActuelle = maintenant.getFullYear();
+            
+            document.getElementById('displayBailleurNom').textContent = bailleurNom;
+            document.getElementById('displayBailleurAdresse').textContent = bailleurAdresse;
+            document.getElementById('displayLocataireNom').textContent = locataireNom;
+            document.getElementById('displayLocataireAdresse').textContent = locataireAdresse;
+            document.getElementById('displayLoyer').textContent = montantLoyer.toFixed(2);
+            document.getElementById('displayCharges').textContent = montantCharges.toFixed(2);
+            document.getElementById('displayTotal').textContent = total.toFixed(2);
+            document.getElementById('displayTotal2').textContent = total.toFixed(2);
+            document.getElementById('displayPeriode').textContent = nomMois + ' ' + annee;
+            document.getElementById('displayDate').textContent = jour + '/' + moisActuel + '/' + anneeActuelle;
+            document.getElementById('dateQuittance').textContent = 'Mois de ' + nomMois.charAt(0).toUpperCase() + nomMois.slice(1) + ' ' + annee;
+            
+            document.getElementById('quittanceContainer').classList.add('show');
+            document.getElementById('quittanceContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
